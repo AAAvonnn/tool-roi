@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ROI 棰勬祴 | HH</title>
+<title>ROI 预测 | HH</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{
@@ -50,7 +50,7 @@ input:focus{outline:none;border-color:#667eea;background:rgba(255,255,255,0.08);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;
 }
 .roi-label{font-size:13px;color:#ddd;margin-bottom:4px}
-.roi-sub{font-size:11px;color:#ccc;margin-top:4px}
+.roi-sub{font-size:12px;color:#ccc;margin-top:4px}
 
 .metrics{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:20px}
 .metric{
@@ -61,7 +61,7 @@ input:focus{outline:none;border-color:#667eea;background:rgba(255,255,255,0.08);
 .metric .lbl{font-size:10px;color:#ddd;margin-top:3px}
 .cl-blue{color:#667eea}.cl-green{color:#3fb950}.cl-purple{color:#d2a8ff}.cl-red{color:#f85149}
 
-.formula{font-size:11px;color:#bbb;text-align:center;margin-top:16px;line-height:1.6}
+.formula{font-size:11px;color:#ccc;text-align:center;margin-top:16px;line-height:1.6}
 .history{margin-top:16px}
 .history h3{font-size:13px;color:#ddd;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
 .btn-clear{font-size:10px;padding:4px 10px;border-radius:8px;border:1px solid rgba(248,81,73,.3);background:transparent;color:#f85149;cursor:pointer}
@@ -74,49 +74,49 @@ input:focus{outline:none;border-color:#667eea;background:rgba(255,255,255,0.08);
 .history-item .ad{font-size:18px;font-weight:800;background:linear-gradient(135deg,#667eea,#764ba2);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .history-item .del{color:#f85149;cursor:pointer;margin-left:10px;font-size:18px;opacity:.6}
 .history-item .del:hover{opacity:1}
-.empty{text-align:center;color:#bbb;font-size:11px;padding:12px}
+.empty{text-align:center;color:#ccc;font-size:11px;padding:12px}
 </style>
 </head>
 <body>
 <div class="card">
-  <h1>ROI 棰勬祴鍣?/h1>
-  <div class="sub">绠楁竻妤氬啀鎶?路 鐩爣鍒╂鼎鐜?13%</div>
+  <h1>ROI 预测器</h1>
+  <div class="sub">算清楚再投 · 目标利润率 13%</div>
 
   <div class="row">
-    <div><label>鎴愭湰 楼</label><input id="cost" type="number" value="6.6" step="0.01"></div>
-    <div><label>鍞环 楼</label><input id="price" type="number" value="29.9" step="0.01"></div>
-    <div><label>蹇€?楼</label><input id="ship" type="number" value="2.4" step="0.01"></div>
+    <div><label>成本 ¥</label><input id="cost" type="number" value="6.6" step="0.01"></div>
+    <div><label>售价 ¥</label><input id="price" type="number" value="29.9" step="0.01"></div>
+    <div><label>快递 ¥</label><input id="ship" type="number" value="2.4" step="0.01"></div>
   </div>
   <div class="row">
-    <div><label>鎵嬬画璐?%</label><input id="fee" type="number" value="5" step="0.01"></div>
-    <div><label>杩旂偣 %</label><input id="rebate" type="number" value="2" step="0.01"></div>
-    <div><label>绛炬敹 %</label><input id="sign" type="number" value="85" step="0.1"></div>
+    <div><label>手续费 %</label><input id="fee" type="number" value="5" step="0.01"></div>
+    <div><label>返点 %</label><input id="rebate" type="number" value="2" step="0.01"></div>
+    <div><label>签收 %</label><input id="sign" type="number" value="85" step="0.1"></div>
   </div>
   <div class="row">
-    <div><label>鐩爣鍒╂鼎 %</label><input id="target" type="number" value="13" step="0.1"></div>
-    <div><label>棰勪及閿€閲?/label><input id="qty" type="number" value="100" step="1"></div>
+    <div><label>目标利润 %</label><input id="target" type="number" value="13" step="0.1"></div>
+    <div><label>预估销量</label><input id="qty" type="number" value="100" step="1"></div>
   </div>
 
   <div class="btn-row">
-    <button class="btn btn-save" onclick="save()">馃捑 淇濆瓨</button>
-    <button class="btn btn-reset" onclick="resetAll()">馃攧 閲嶇疆</button>
+    <button class="btn btn-save" onclick="save()">保存</button>
+    <button class="btn btn-reset" onclick="resetAll()">重置</button>
   </div>
 
   <div class="result">
-    <div class="roi-label">鏈€浣?ROI 瑕佹眰</div>
+    <div class="roi-label">最低 ROI 要求</div>
     <div class="roi-big" id="roi">0.00</div>
-    <div class="roi-sub">鍗曚欢骞垮憡 鈮?<span id="maxAd" style="color:#667eea;font-weight:700">楼0.00</span></div>
+    <div class="roi-sub">单件广告 ≤ <span id="maxAd" style="color:#667eea;font-weight:700">¥0.00</span></div>
     <div class="metrics">
-      <div class="metric"><div class="val cl-green" id="unitProfit">楼0.00</div><div class="lbl">鍗曚欢姣涘埄</div></div>
-      <div class="metric"><div class="val cl-purple" id="totalAd">楼0</div><div class="lbl">骞垮憡鎬婚绠?/div></div>
-      <div class="metric"><div class="val cl-green" id="predProfit">楼0</div><div class="lbl">棰勪及鎬诲埄娑?/div></div>
+      <div class="metric"><div class="val cl-green" id="unitProfit">¥0.00</div><div class="lbl">单件毛利</div></div>
+      <div class="metric"><div class="val cl-purple" id="totalAd">¥0</div><div class="lbl">广告总预算</div></div>
+      <div class="metric"><div class="val cl-green" id="predProfit">¥0</div><div class="lbl">预估总利润</div></div>
     </div>
     <div class="formula" id="explain"></div>
   </div>
 
   <div class="history" id="historyPanel">
-    <h3>馃搵 鍘嗗彶 <button class="btn-clear" onclick="clearHistory()">娓呯┖</button></h3>
-    <div id="historyList"><div class="empty">鏆傛棤璁板綍</div></div>
+    <h3>历史 <button class="btn-clear" onclick="clearHistory()">清空</button></h3>
+    <div id="historyList"><div class="empty">暂无记录</div></div>
   </div>
 </div>
 
@@ -131,13 +131,13 @@ function calc(){
   const roival=ma>0?gp/ma:0;
 
   $('roi').textContent=roival.toFixed(2);
-  $('maxAd').textContent='楼'+ma.toFixed(2);
+  $('maxAd').textContent='¥'+ma.toFixed(2);
   $('maxAd').style.color=ma>0?'#667eea':'#f85149';
-  $('unitProfit').textContent='楼'+gp.toFixed(2);
+  $('unitProfit').textContent='¥'+gp.toFixed(2);
   $('unitProfit').className=gp>0?'val cl-green':'val cl-red';
-  $('totalAd').textContent=ta>0?'楼'+ta.toFixed(0):'浜?;
-  $('predProfit').textContent=ma>0?'楼'+(qty*tpp).toFixed(0):'浜?;
-  $('explain').innerHTML=`楼${p}脳绛炬敹${(sign*100).toFixed(0)}%=瀹炴敹楼${ap.toFixed(2)}<br>鈭掓垚鏈?{c}鈭掑揩閫捖?{s}鈭掓墸鐐孤?{pf.toFixed(1)}=姣涘埄楼${gp.toFixed(2)} 鈫?鐣?{(target*100).toFixed(0)}%鍒╂鼎 鈫?骞垮憡鈮ぢ?{ma.toFixed(2)}`;
+  $('totalAd').textContent=ta>0?'¥'+ta.toFixed(0):'亏';
+  $('predProfit').textContent=ma>0?'¥'+(qty*tpp).toFixed(0):'亏';
+  $('explain').innerHTML=`¥${p}×签收${(sign*100).toFixed(0)}%=实收¥${ap.toFixed(2)}<br>−成本¥${c}−快递¥${s}−扣点¥${pf.toFixed(1)}=毛利¥${gp.toFixed(2)} → 留${(target*100).toFixed(0)}%利润 → 广告≤¥${ma.toFixed(2)}`;
 }
 function save(){
   const c=+($('cost').value)||0, p=+($('price').value)||0, r=$('roi').textContent;
@@ -148,13 +148,13 @@ function save(){
 }
 function resetAll(){
   ['cost','price','ship','fee','rebate','sign','target','qty'].forEach(id=>$(id).value='');
-  $('roi').textContent='0.00';$('maxAd').textContent='楼0.00';
+  $('roi').textContent='0.00';$('maxAd').textContent='¥0.00';
 }
 function clearHistory(){localStorage.removeItem('roi_history');renderHistory();}
 function renderHistory(){
   let h=JSON.parse(localStorage.getItem('roi_history')||'[]');
-  if(!h.length){$('historyList').innerHTML='<div class="empty">鏆傛棤璁板綍</div>';return;}
-  $('historyList').innerHTML=h.map((item,i)=>`<div class="history-item"><div class="info">鎴愭湰楼${item.cost} 鍞环楼${item.price}<br><span style="color:#ccc;font-size:10px">${item.time}</span></div><div class="ad">${item.roi}</div><span class="del" onclick="delItem(${i})">脳</span></div>`).join('');
+  if(!h.length){$('historyList').innerHTML='<div class="empty">暂无记录</div>';return;}
+  $('historyList').innerHTML=h.map((item,i)=>`<div class="history-item"><div class="info">成本¥${item.cost} 售价¥${item.price}<br><span style="color:#ccc;font-size:10px">${item.time}</span></div><div class="ad">${item.roi}</div><span class="del" onclick="delItem(${i})">×</span></div>`).join('');
 }
 function delItem(i){let h=JSON.parse(localStorage.getItem('roi_history')||'[]');h.splice(i,1);localStorage.setItem('roi_history',JSON.stringify(h));renderHistory();}
 document.querySelectorAll('input').forEach(el=>el.addEventListener('input',calc));
@@ -162,4 +162,3 @@ calc();renderHistory();
 </script>
 </body>
 </html>
-
