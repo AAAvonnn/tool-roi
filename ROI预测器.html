@@ -6,41 +6,81 @@
 <title>ROI 预测 | HH</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Microsoft YaHei',sans-serif;background:#0d1117;color:#c9d1d9;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:20px}
-.card{background:#161b22;border:1px solid #30363d;border-radius:16px;padding:24px;max-width:420px;width:100%}
-h1{font-size:20px;text-align:center;margin-bottom:2px;color:#58a6ff}
-.sub{text-align:center;font-size:12px;color:#8b949e;margin-bottom:16px}
+body{
+  font-family:'Microsoft YaHei',-apple-system,sans-serif;
+  background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);
+  color:#e0e0e0;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:16px;
+}
+.card{
+  background:rgba(255,255,255,0.03);
+  backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:24px;padding:28px 24px;max-width:420px;width:100%;
+  box-shadow:0 20px 60px rgba(0,0,0,0.5);
+}
+h1{font-size:22px;text-align:center;margin-bottom:2px;
+  background:linear-gradient(90deg,#667eea,#764ba2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.sub{text-align:center;font-size:12px;color:#888;margin-bottom:20px}
 .row{display:flex;gap:8px;margin-bottom:8px}
 .row>div{flex:1}
-label{font-size:11px;color:#8b949e;display:block;margin-bottom:2px}
-input{width:100%;padding:8px;background:#0d1117;border:1px solid #30363d;border-radius:6px;color:#c9d1d9;font-size:14px;text-align:center}
-input:focus{outline:none;border-color:#58a6ff}
-.btn-row{display:flex;gap:8px;margin:12px 0}
-.btn{flex:1;padding:10px;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:bold}
-.btn-save{background:#238636;color:#fff}
-.btn-reset{background:#21262d;color:#8b949e;border:1px solid #30363d}
-.btn-clear{background:#21262d;color:#f85149;border:1px solid #30363d;font-size:11px;padding:6px}
-.result{padding:16px;background:#0d1117;border-radius:12px;border:1px solid #30363d;margin:12px 0}
-.big-num{font-size:38px;font-weight:bold;text-align:center}
-.blue{color:#58a6ff}.green{color:#3fb950}.red{color:#f85149}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid #30363d}
-.item{text-align:center}
-.item .val{font-size:18px;font-weight:bold}
-.item .lbl{font-size:11px;color:#8b949e;margin-top:1px}
-.formula{font-size:10px;color:#484f58;text-align:center;margin-top:10px}
-.history{margin-top:12px}
-.history h3{font-size:13px;color:#8b949e;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
-.history-item{background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:10px;margin-bottom:6px;font-size:12px;display:flex;justify-content:space-between;align-items:center}
+label{font-size:11px;color:#999;display:block;margin-bottom:3px}
+input{
+  width:100%;padding:10px 8px;
+  background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);
+  border-radius:10px;color:#fff;font-size:14px;text-align:center;
+  transition:all .2s;
+}
+input:focus{outline:none;border-color:#667eea;background:rgba(255,255,255,0.08);box-shadow:0 0 0 3px rgba(102,126,234,0.15)}
+.btn-row{display:flex;gap:8px;margin:16px 0}
+.btn{
+  flex:1;padding:12px;border:none;border-radius:12px;cursor:pointer;
+  font-size:13px;font-weight:600;transition:all .2s;
+}
+.btn-save{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff}
+.btn-reset{background:rgba(255,255,255,0.05);color:#aaa;border:1px solid rgba(255,255,255,0.1)}
+.btn:hover{transform:translateY(-1px);box-shadow:0 8px 25px rgba(0,0,0,0.3)}
+
+.result{
+  background:linear-gradient(135deg,rgba(102,126,234,.08),rgba(118,75,162,.08));
+  border:1px solid rgba(102,126,234,.2);
+  border-radius:20px;padding:24px;text-align:center;
+}
+.roi-big{font-size:64px;font-weight:800;line-height:1;
+  background:linear-gradient(135deg,#f093fb,#f5576c,#ffd452);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.roi-label{font-size:13px;color:#999;margin-bottom:4px}
+.roi-sub{font-size:11px;color:#666;margin-top:4px}
+
+.metrics{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:20px}
+.metric{
+  background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);
+  border-radius:14px;padding:14px 8px;text-align:center;
+}
+.metric .val{font-size:16px;font-weight:700}
+.metric .lbl{font-size:10px;color:#888;margin-top:3px}
+.cl-blue{color:#667eea}.cl-green{color:#3fb950}.cl-purple{color:#d2a8ff}.cl-red{color:#f85149}
+
+.formula{font-size:11px;color:#555;text-align:center;margin-top:16px;line-height:1.6}
+.history{margin-top:16px}
+.history h3{font-size:13px;color:#888;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.btn-clear{font-size:10px;padding:4px 10px;border-radius:8px;border:1px solid rgba(248,81,73,.3);background:transparent;color:#f85149;cursor:pointer}
+.history-item{
+  background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);
+  border-radius:10px;padding:10px 12px;margin-bottom:6px;font-size:12px;
+  display:flex;justify-content:space-between;align-items:center;
+}
 .history-item .info{flex:1}
-.history-item .ad{font-size:16px;font-weight:bold;color:#58a6ff}
-.history-item .del{color:#f85149;cursor:pointer;margin-left:8px;font-size:16px}
-.empty{text-align:center;color:#484f58;font-size:12px;padding:12px}
+.history-item .ad{font-size:18px;font-weight:800;background:linear-gradient(135deg,#667eea,#764ba2);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.history-item .del{color:#f85149;cursor:pointer;margin-left:10px;font-size:18px;opacity:.6}
+.history-item .del:hover{opacity:1}
+.empty{text-align:center;color:#555;font-size:11px;padding:12px}
 </style>
 </head>
 <body>
 <div class="card">
-  <h1>🎯 ROI 预测器</h1>
-  <div class="sub">算清楚再投</div>
+  <h1>ROI 预测器</h1>
+  <div class="sub">算清楚再投 · 目标利润率 13%</div>
 
   <div class="row">
     <div><label>成本 ¥</label><input id="cost" type="number" value="6.6" step="0.01"></div>
@@ -58,82 +98,65 @@ input:focus{outline:none;border-color:#58a6ff}
   </div>
 
   <div class="btn-row">
-    <button class="btn btn-save" onclick="save()">💾 保存这条</button>
-    <button class="btn btn-reset" onclick="resetAll()">🔄 一键重置</button>
+    <button class="btn btn-save" onclick="save()">💾 保存</button>
+    <button class="btn btn-reset" onclick="resetAll()">🔄 重置</button>
   </div>
 
   <div class="result">
-    <div style="font-size:11px;color:#8b949e;text-align:center;margin-bottom:2px">单件最多广告费</div>
-    <div class="big-num blue" id="maxAd">¥0.00</div>
-    <div class="grid">
-      <div class="item"><div class="val green" id="unitProfit">¥0.00</div><div class="lbl">单件毛利</div></div>
-      <div class="item"><div class="val" style="color:#d2a8ff" id="totalAd">¥0</div><div class="lbl">总广告上限</div></div>
-      <div class="item"><div class="val blue" id="roi">0.00</div><div class="lbl">最低ROI</div></div>
-      <div class="item"><div class="val green" id="predProfit">¥0</div><div class="lbl">预估总利润</div></div>
+    <div class="roi-label">最低 ROI 要求</div>
+    <div class="roi-big" id="roi">0.00</div>
+    <div class="roi-sub">单件广告 ≤ <span id="maxAd" style="color:#667eea;font-weight:700">¥0.00</span></div>
+    <div class="metrics">
+      <div class="metric"><div class="val cl-green" id="unitProfit">¥0.00</div><div class="lbl">单件毛利</div></div>
+      <div class="metric"><div class="val cl-purple" id="totalAd">¥0</div><div class="lbl">广告总预算</div></div>
+      <div class="metric"><div class="val cl-green" id="predProfit">¥0</div><div class="lbl">预估总利润</div></div>
     </div>
     <div class="formula" id="explain"></div>
   </div>
 
   <div class="history" id="historyPanel">
-    <h3>📋 历史记录 <button class="btn btn-clear" onclick="clearHistory()">清空</button></h3>
+    <h3>📋 历史 <button class="btn-clear" onclick="clearHistory()">清空</button></h3>
     <div id="historyList"><div class="empty">暂无记录</div></div>
   </div>
 </div>
 
 <script>
 const $=id=>document.getElementById(id);
-
 function calc(){
   const c=+($('cost').value)||0, p=+($('price').value)||0, s=+($('ship').value)||0;
   const fee=(+($('fee').value)||0)/100, rebate=(+($('rebate').value)||0)/100, sign=(+($('sign').value)||100)/100;
   const target=(+($('target').value)||13)/100, qty=+($('qty').value)||100;
-
   const net=fee-rebate, ap=p*sign, pf=ap*net;
   const gp=ap-c-s-pf, tpp=p*target, ma=gp-tpp, ta=qty*ma;
+  const roival=ma>0?gp/ma:0;
 
+  $('roi').textContent=roival.toFixed(2);
   $('maxAd').textContent='¥'+ma.toFixed(2);
-  $('maxAd').className='big-num '+(ma>0?'blue':'red');
+  $('maxAd').style.color=ma>0?'#667eea':'#f85149';
   $('unitProfit').textContent='¥'+gp.toFixed(2);
+  $('unitProfit').className=gp>0?'val cl-green':'val cl-red';
   $('totalAd').textContent=ta>0?'¥'+ta.toFixed(0):'亏';
-  $('roi').textContent=ma>0?((gp/ma).toFixed(2)):'-';
   $('predProfit').textContent=ma>0?'¥'+(qty*tpp).toFixed(0):'亏';
-  $('explain').innerHTML=`¥${p}×签收${(sign*100).toFixed(0)}%=实收¥${ap.toFixed(2)} −成本¥${c} −快递¥${s} −扣点¥${pf.toFixed(1)} = 毛利¥${gp.toFixed(2)} → 留¥${tpp.toFixed(2)} → 广告≤¥${ma.toFixed(2)}`;
+  $('explain').innerHTML=`¥${p}×签收${(sign*100).toFixed(0)}%=实收¥${ap.toFixed(2)}<br>−成本¥${c}−快递¥${s}−扣点¥${pf.toFixed(1)}=毛利¥${gp.toFixed(2)} → 留${(target*100).toFixed(0)}%利润 → 广告≤¥${ma.toFixed(2)}`;
 }
-
 function save(){
-  const c=+($('cost').value)||0, p=+($('price').value)||0, ma=$('maxAd').textContent;
-  const item={cost:c,price:p,ad:ma,time:new Date().toLocaleString('zh-CN')};
+  const c=+($('cost').value)||0, p=+($('price').value)||0, r=$('roi').textContent;
   let h=JSON.parse(localStorage.getItem('roi_history')||'[]');
-  h.unshift(item); if(h.length>20)h=h.slice(0,20);
-  localStorage.setItem('roi_history',JSON.stringify(h));
-  renderHistory();
+  h.unshift({cost:c,price:p,roi:r,time:new Date().toLocaleString('zh-CN')});
+  if(h.length>20)h=h.slice(0,20);
+  localStorage.setItem('roi_history',JSON.stringify(h));renderHistory();
 }
-
 function resetAll(){
   ['cost','price','ship','fee','rebate','sign','target','qty'].forEach(id=>$(id).value='');
-  document.querySelector('.big-num').textContent='¥0.00';
+  $('roi').textContent='0.00';$('maxAd').textContent='¥0.00';
 }
-
 function clearHistory(){localStorage.removeItem('roi_history');renderHistory();}
-
 function renderHistory(){
   let h=JSON.parse(localStorage.getItem('roi_history')||'[]');
   if(!h.length){$('historyList').innerHTML='<div class="empty">暂无记录</div>';return;}
-  $('historyList').innerHTML=h.map((item,i)=>`
-    <div class="history-item">
-      <div class="info">成本¥${item.cost} 售价¥${item.price}<br><span style="color:#8b949e;font-size:10px">${item.time}</span></div>
-      <div class="ad">${item.ad}</div>
-      <span class="del" onclick="delItem(${i})">×</span>
-    </div>`).join('');
+  $('historyList').innerHTML=h.map((item,i)=>`<div class="history-item"><div class="info">成本¥${item.cost} 售价¥${item.price}<br><span style="color:#666;font-size:10px">${item.time}</span></div><div class="ad">${item.roi}</div><span class="del" onclick="delItem(${i})">×</span></div>`).join('');
 }
-
-function delItem(i){
-  let h=JSON.parse(localStorage.getItem('roi_history')||'[]');
-  h.splice(i,1);
-  localStorage.setItem('roi_history',JSON.stringify(h));
-  renderHistory();
-}
-
+function delItem(i){let h=JSON.parse(localStorage.getItem('roi_history')||'[]');h.splice(i,1);localStorage.setItem('roi_history',JSON.stringify(h));renderHistory();}
 document.querySelectorAll('input').forEach(el=>el.addEventListener('input',calc));
 calc();renderHistory();
 </script>
