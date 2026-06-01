@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>电商 ROI 计算器 | HH × Avon</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Microsoft YaHei', sans-serif; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: #e0e0e0; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+.container { background: #0f3460; border-radius: 20px; padding: 30px; max-width: 520px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+h1 { text-align: center; font-size: 22px; margin-bottom: 5px; color: #e94560; }
+.sub { text-align: center; font-size: 12px; color: #888; margin-bottom: 25px; }
+.row { display: flex; gap: 10px; margin-bottom: 10px; }
+.col { flex: 1; }
+.col2 { flex: 2; }
+label { display: block; font-size: 12px; color: #aaa; margin-bottom: 3px; }
+input { width: 100%; padding: 9px; border-radius: 8px; border: 1px solid #1a1a3e; background: #1a1a2e; color: #fff; font-size: 14px; text-align: center; }
+input:focus { outline: none; border-color: #e94560; }
+.result { background: #1a1a2e; border-radius: 12px; padding: 20px; margin-top: 20px; text-align: center; }
+.result .main { font-size: 38px; font-weight: bold; }
+.positive { color: #00d2ff; }
+.negative { color: #e94560; }
+.roi-row { display: flex; justify-content: space-around; margin-top: 15px; padding-top: 15px; border-top: 1px solid #0f3460; }
+.roi-item { text-align: center; }
+.roi-item .val { font-size: 18px; font-weight: bold; }
+.roi-item .lbl { font-size: 11px; color: #888; margin-top: 3px; }
+.breakdown { margin-top: 15px; padding-top: 15px; border-top: 1px solid #0f3460; text-align: left; font-size: 12px; color: #aaa; }
+.breakdown .line { display: flex; justify-content: space-between; margin-bottom: 3px; }
+.breakdown .line span:last-child { color: #ccc; }
+.btn-row { display: flex; gap: 10px; margin-top: 15px; }
+.btn { flex: 1; padding: 10px; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; }
+.btn-reset { background: #1a1a2e; color: #aaa; }
+.btn-calc { background: #e94560; color: #fff; font-weight: bold; }
+.btn:hover { opacity: 0.85; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>📊 电商 ROI 计算器</h1>
+  <div class="sub">HH 出品 · 首饰电商专用</div>
+
+  <div class="row">
+    <div class="col"><label>成本单价 ¥</label><input id="cost" type="number" value="6.6" step="0.01"></div>
+    <div class="col"><label>销售单价 ¥</label><input id="price" type="number" value="29.9" step="0.01"></div>
+    <div class="col"><label>成交单数</label><input id="units" type="number" value="29"></div>
+  </div>
+  <div class="row">
+    <div class="col"><label>广告消耗 ¥</label><input id="ad" type="number" value="520" step="0.01"></div>
+    <div class="col"><label>快递单价 ¥</label><input id="shipping" type="number" value="2.4" step="0.01"></div>
+    <div class="col"><label>每日退款 ¥</label><input id="refund" type="number" value="86.71" step="0.01"></div>
+  </div>
+  <div class="row">
+    <div class="col"><label>发货率 %</label><input id="shipRate" type="number" value="95" step="0.1"></div>
+    <div class="col"><label>手续费率 %</label><input id="fee" type="number" value="5" step="0.01"></div>
+    <div class="col"><label>广告返点 %</label><input id="adRebate" type="number" value="2" step="0.01"></div>
+  </div>
+  <div class="row">
+    <div class="col"><label>平台返点 %</label><input id="rebate" type="number" value="2" step="0.01"></div>
+    <div class="col"><label>签收率 %</label><input id="signRate" type="number" value="85" step="0.1"></div>
+    <div class="col"></div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-reset" onclick="resetAll()">重置</button>
+    <button class="btn btn-calc" onclick="calc()">计算</button>
+  </div>
+
+  <div class="result" id="result" style="display:none">
+    <div style="font-size:13px;color:#888;margin-bottom:5px">实际剩余利润</div>
+    <div class="main" id="profit">¥0.00</div>
+    <div class="roi-row">
+      <div class="roi-item"><div class="val" id="roi">0.00</div><div class="lbl">ROI</div></div>
+      <div class="roi-item"><div class="val" id="margin">0%</div><div class="lbl">利润率</div></div>
+      <div class="roi-item"><div class="val" id="adRatio">0%</div><div class="lbl">广告占比</div></div>
+    </div>
+    <div class="breakdown" id="bd"></div>
+  </div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+function calc() {
+  const c = +($('cost').value)||0, p = +($('price').value)||0, u = +($('units').value)||0;
+  const ad = +($('ad').value)||0, sp = +($('shipping').value)||0, dr = +($('refund').value)||0;
+  const sr = (+($('shipRate').value)||100)/100, fr = (+($('fee').value)||0)/100;
+  const ar = (+($('adRebate').value)||0)/100, pr = (+($('rebate').value)||0)/100;
+  const sgr = (+($('signRate').value)||100)/100;
+
+  const gmv = u * p;
+  const shipUnits = u * sr;
+  const signUnits = u * sgr;
+  const actualRev = gmv * sgr;
+  const productCost = u * c;
+  const adActual = ad * (1 - ar);
+  const netFee = fr - pr;
+  const platFee = actualRev * netFee;
+  const shipFee = shipUnits * sp;
+  const realProfit = actualRev - productCost - adActual - platFee - shipFee;
+  const roi = (productCost+adActual+platFee+shipFee) > 0 ? actualRev/(productCost+adActual+platFee+shipFee) : 0;
+  const margin = actualRev>0 ? (realProfit/actualRev*100) : 0;
+  const adPct = actualRev>0 ? (adActual/actualRev*100) : 0;
+
+  $('result').style.display='block';
+  const pe = $('profit'); pe.textContent = '¥'+realProfit.toFixed(2);
+  pe.className = 'main '+(realProfit>=0?'positive':'negative');
+  $('roi').textContent = roi.toFixed(2);
+  $('margin').textContent = margin.toFixed(1)+'%';
+  $('adRatio').textContent = adPct.toFixed(1)+'%';
+  $('bd').innerHTML =
+    `<div class="line"><span>成交额 (${u}单 × ¥${p})</span><span>¥${gmv.toFixed(2)}</span></div>`+
+    `<div class="line"><span>实际成交额 (签收${(sgr*100).toFixed(0)}%)</span><span>¥${actualRev.toFixed(2)}</span></div>`+
+    `<div class="line"><span>实际成本 (${u}件 × ¥${c})</span><span>¥${productCost.toFixed(2)}</span></div>`+
+    `<div class="line"><span>广告实际消耗 (返点${(ar*100).toFixed(1)}%)</span><span>¥${adActual.toFixed(2)}</span></div>`+
+    `<div class="line"><span>实际平台扣点 (净${(netFee*100).toFixed(1)}%)</span><span>¥${platFee.toFixed(2)}</span></div>`+
+    `<div class="line"><span>快递费 (${shipUnits.toFixed(0)}单)</span><span>¥${shipFee.toFixed(2)}</span></div>`;
+}
+function resetAll() {
+  ['cost','price','units','ad','shipping','refund','shipRate','fee','adRebate','rebate','signRate'].forEach(id=>$(id).value='');
+  $('result').style.display='none';
+}
+document.querySelectorAll('input').forEach(el=>el.addEventListener('input',calc));
+calc();
+</script>
+</body>
+</html>
