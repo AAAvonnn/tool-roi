@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ROI 预测 | HH</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Microsoft YaHei',sans-serif;background:#0d1117;color:#c9d1d9;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:20px}
+.card{background:#161b22;border:1px solid #30363d;border-radius:16px;padding:28px;max-width:400px;width:100%}
+h1{font-size:20px;text-align:center;margin-bottom:4px;color:#58a6ff}
+.sub{text-align:center;font-size:12px;color:#8b949e;margin-bottom:20px}
+.input-group{margin-bottom:12px}
+label{font-size:12px;color:#8b949e;display:block;margin-bottom:3px}
+.row{display:flex;gap:10px}
+.row>div{flex:1}
+input,select{width:100%;padding:10px;background:#0d1117;border:1px solid #30363d;border-radius:8px;color:#c9d1d9;font-size:15px;text-align:center}
+input:focus{outline:none;border-color:#58a6ff}
+.result{margin-top:20px;padding:20px;background:#0d1117;border-radius:12px;border:1px solid #30363d}
+.big-num{font-size:42px;font-weight:bold;text-align:center}
+.green{color:#3fb950}
+.red{color:#f85149}
+.blue{color:#58a6ff}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;padding-top:16px;border-top:1px solid #30363d}
+.item{text-align:center}
+.item .val{font-size:20px;font-weight:bold}
+.item .lbl{font-size:11px;color:#8b949e;margin-top:2px}
+.target-row{display:flex;align-items:center;gap:10px;margin-top:12px}
+.target-row input{width:70px}
+.slider{width:100%;margin:10px 0}
+.formula{font-size:11px;color:#484f58;text-align:center;margin-top:12px}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>🎯 ROI 预测器</h1>
+  <div class="sub">算清楚再投 · 目标利润率 13%</div>
+
+  <div class="row">
+    <div class="input-group"><label>成本单价 ¥</label><input id="cost" type="number" value="6.6" step="0.01"></div>
+    <div class="input-group"><label>销售单价 ¥</label><input id="price" type="number" value="29.9" step="0.01"></div>
+  </div>
+  <div class="row">
+    <div class="input-group"><label>快递费 ¥/单</label><input id="ship" type="number" value="2.4" step="0.01"></div>
+    <div class="input-group"><label>手续费 %</label><input id="fee" type="number" value="5" step="0.01"></div>
+  </div>
+  <div class="row">
+    <div class="input-group"><label>平台返点 %</label><input id="rebate" type="number" value="2" step="0.01"></div>
+    <div class="input-group"><label>预期签收率 %</label><input id="sign" type="number" value="85" step="0.1"></div>
+  </div>
+  <div class="row">
+    <div class="input-group"><label>目标利润率 %</label><input id="target" type="number" value="13" step="0.1"></div>
+    <div class="input-group"><label>预估销量</label><input id="qty" type="number" value="100" step="1"></div>
+  </div>
+
+  <div class="result">
+    <div style="font-size:12px;color:#8b949e;text-align:center;margin-bottom:4px">单件最多广告费</div>
+    <div class="big-num blue" id="maxAd">¥0.00</div>
+    <div class="grid">
+      <div class="item"><div class="val green" id="unitProfit">¥0.00</div><div class="lbl">单件毛利润</div></div>
+      <div class="item"><div class="val" style="color:#d2a8ff" id="totalAd">¥0</div><div class="lbl">总广告预算上限</div></div>
+      <div class="item"><div class="val blue" id="roi">0.00</div><div class="lbl">最低 ROI 要求</div></div>
+      <div class="item"><div class="val" id="predProfit">¥0</div><div class="lbl">预估总利润</div></div>
+    </div>
+    <div class="formula" id="explain"></div>
+  </div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+function calc(){
+  const cost=+($('cost').value)||0, price=+($('price').value)||0, ship=+($('ship').value)||0;
+  const fee=(+($('fee').value)||0)/100, rebate=(+($('rebate').value)||0)/100, sign=(+($('sign').value)||100)/100;
+  const target=(+($('target').value)||13)/100, qty=+($('qty').value)||100;
+
+  const netFee=fee-rebate;
+  const actualPrice=price*sign;
+  const platFee=actualPrice*netFee;
+  const grossProfit=actualPrice-cost-ship-platFee;
+  const targetProfitPerUnit=price*target;
+  const maxAdPerUnit=grossProfit-targetProfitPerUnit;
+  const totalAd=qty*maxAdPerUnit;
+
+  $('maxAd').textContent='¥'+maxAdPerUnit.toFixed(2);
+  $('maxAd').className='big-num '+(maxAdPerUnit>0?'blue':'red');
+  $('unitProfit').textContent='¥'+grossProfit.toFixed(2);
+  $('totalAd').textContent=totalAd>0?'¥'+totalAd.toFixed(0):'亏';
+  $('roi').textContent=maxAdPerUnit>0?((grossProfit/maxAdPerUnit).toFixed(2)):'-';
+  $('predProfit').textContent=(maxAdPerUnit>0?'¥'+(qty*targetProfitPerUnit).toFixed(0):'亏');
+  $('explain').innerHTML=`售价¥${price} × 签收${(sign*100).toFixed(0)}% = 实收¥${actualPrice.toFixed(2)}<br>−成本¥${cost} −快递¥${ship} −扣点¥${platFee.toFixed(1)}(净${(netFee*100).toFixed(0)}%)<br>= 毛利¥${grossProfit.toFixed(2)} → 留¥${targetProfitPerUnit.toFixed(2)} → 广告≤¥${maxAdPerUnit.toFixed(2)}/件`;
+}
+document.querySelectorAll('input').forEach(el=>el.addEventListener('input',calc));
+calc();
+</script>
+</body>
+</html>
